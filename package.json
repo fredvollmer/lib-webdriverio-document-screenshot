@@ -1,0 +1,29 @@
+{
+  "name": "webdriverio-docShot",
+  "version": "1.0.0",
+  "description": "WebdriverIO plugin to save a screenshot of the entire screenshot document",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jadamgreen1010/webdriverio-docShot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^1.4.2",
+    "gm": "^1.20.0",
+    "rimraf": "^2.4.3"
+  },
+  "keywords": [
+    "webdriverjs",
+    "webdriverio",
+    "webdrivercss",
+    "webdriver",
+    "plugin",
+    "screenshot",
+    "document"
+  ]
+}
