@@ -25,20 +25,15 @@
 /* global document,window */
 
 var async = require('async'),
-    fs = require('fs'),
+    fs = require('fs-extra'),
     gm = require('gm'),
     rimraf = require('rimraf'),
-    generateUUID = require('./generateUUID.js'),
+    generateUUID = require('../utils/generateUUID.js'),
     path = require('path');
 
-module.exports = function documentScreenshot(fileName) {
+module.exports = function documentScreenshot(fileName, callback) {
 
     var ErrorHandler = this.ErrorHandler;
-
-    /*!
-     * make sure that callback contains chainit callback
-     */
-    var callback = arguments[arguments.length - 1];
 
     /*!
      * parameter check
@@ -206,6 +201,16 @@ module.exports = function documentScreenshot(fileName) {
         },
 
         /*!
+         * ensure that filename exists
+         */
+        function(cb) {
+            var dir = fileName.replace(/[^\/ \\]*\.png$/,'');
+            fs.ensureDir(dir, function(err) {
+                cb(err);
+            });
+        },
+
+        /*!
          * concats all shots
          */
         function(cb) {
@@ -249,7 +254,7 @@ module.exports = function documentScreenshot(fileName) {
             });
         }
     ], function(err) {
-        callback(err, null, response);
+        callback(err, response);
     });
 
 };
