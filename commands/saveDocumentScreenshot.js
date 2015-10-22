@@ -33,7 +33,7 @@ var async = require('async'),
 
 module.exports = function documentScreenshot(fileName) {
 
-    var ErrorHandler = this.instance.ErrorHandler;
+    var ErrorHandler = this.ErrorHandler;
 
     /*!
      * make sure that callback contains chainit callback
@@ -47,7 +47,7 @@ module.exports = function documentScreenshot(fileName) {
         return callback(new ErrorHandler.CommandError('number or type of arguments don\'t agree with saveScreenshot command'));
     }
 
-    var self = this.instance,
+    var self = this,
         response = {
             execute: [],
             screenshot: []
