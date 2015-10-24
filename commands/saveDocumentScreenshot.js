@@ -1,37 +1,37 @@
+/* jshint node: true */
 'use strict';
 
 /**
  *
- * Save a screenshot as a base64 encoded PNG with the current state of the browser.
+ * Save a screenshot as a base64 encoded image with the current state of the browser.
  *
  * <example>
-    :saveScreenshot.js
+    :docShot.js
     client
-        // set browser window size
         .windowHandleSize({width: 500, height: 500})
-        .saveScreenshot('viewport.png') // make screenshot of current viewport (500x500px)
-        .saveScreenshot('wholeScreen.png', true) // makes screenshot of whole document (1280x1342px)
+        .docShot('wholeScreen.png') // makes screenshot of whole document
         .end();
  * </example>
  *
  * @param {String}   fileName    path of generated image (relative to the execution directory)
- * @param {Boolean=} totalScreen if true (default value) it takes a screenshot of whole website, otherwise only of current viewport
  *
- * @uses protocol/execute, utility/scroll, protocol/screenshot
+ * @uses protocol/execute, protocol/screenshot, protocol/pause
  * @type utility
  *
  */
 
 /* global document,window */
 
-var async = require('async'),
-    fs = require('fs-extra'),
-    gm = require('gm'),
-    rimraf = require('rimraf'),
-    generateUUID = require('../utils/generateUUID.js'),
-    path = require('path');
+var fs = require('fs-extra');
+var gm = require('gm');
+var rimraf = require('rimraf');
+var generateUUID = require('../utils/generateUUID.js');
+var path = require('path');
 
-module.exports = function documentScreenshot(fileName, callback) {
+var q = require('q');
+
+module.exports = function documentScreenshot(fileName) {
+
 
     var ErrorHandler = this.ErrorHandler;
 
@@ -39,60 +39,60 @@ module.exports = function documentScreenshot(fileName, callback) {
      * parameter check
      */
     if (typeof fileName !== 'string') {
-        return callback(new ErrorHandler.CommandError('number or type of arguments don\'t agree with saveScreenshot command'));
+        throw new ErrorHandler.CommandError('typeof file name is "' + (typeof fileName) + '". Should be "string"');
     }
 
-    var self = this,
-        response = {
-            execute: [],
-            screenshot: []
-        },
-        tmpDir = null,
-        cropImages = [],
-        currentXPos = 0,
-        currentYPos = 0,
-        screenshot = null,
-        scrollFn = function(w, h) {
+    var client = this;
+
+    var pageInfo = null;
+    var tmpDir = null;
+    var cropImages = [];
+    var x = 0;
+    var y = 0;
+
+    var scrollFn = function scrollFn(w, h) {
+        /**
+         * IE8 or older
+         */
+        if(document.all && !document.addEventListener) {
             /**
-             * IE8 or older
+             * this still might not work
+             * seems that IE8 scroll back to 0,0 before taking screenshots
              */
-            if(document.all && !document.addEventListener) {
-                /**
-                 * this still might not work
-                 * seems that IE8 scroll back to 0,0 before taking screenshots
-                 */
-                document.body.style.marginTop = '-' + h + 'px';
-                document.body.style.marginLeft = '-' + w + 'px';
-                return;
-            }
+            document.body.style.marginTop = '-' + h + 'px';
+            document.body.style.marginLeft = '-' + w + 'px';
+            return;
+        }
 
-            document.body.style.webkitTransform = 'translate(-' + w + 'px, -' + h + 'px)';
-            document.body.style.mozTransform = 'translate(-' + w + 'px, -' + h + 'px)';
-            document.body.style.msTransform = 'translate(-' + w + 'px, -' + h + 'px)';
-            document.body.style.oTransform = 'translate(-' + w + 'px, -' + h + 'px)';
-            document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';
-        };
+        document.body.style.webkitTransform = 'translate(-' + w + 'px, -' + h + 'px)';
+        document.body.style.mozTransform = 'translate(-' + w + 'px, -' + h + 'px)';
+        document.body.style.msTransform = 'translate(-' + w + 'px, -' + h + 'px)';
+        document.body.style.oTransform = 'translate(-' + w + 'px, -' + h + 'px)';
+        document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';
+    };
 
-    async.waterfall([
+    return q()
 
         /*!
          * create tmp directory to cache viewport shots
          */
-        function(cb) {
+        .then(function makeTmpDir(){
+            var deferred = q.defer();
+
             var uuid = generateUUID();
             tmpDir = path.join(__dirname, '..', '.tmp-' + uuid);
 
-            fs.exists(tmpDir, function(exists) {
-                return exists ? cb() : fs.mkdir(tmpDir, '0755', cb);
-            });
-        },
+            fs.mkdirs(tmpDir, '0755', deferred.resolve);
+
+            return deferred.promise;
+        })
 
         /*!
          * prepare page scan
          */
-        function() {
-            var cb = arguments[arguments.length - 1];
-            self.execute(function() {
+        .then(function prepPageScan(){
+            // console.log('In prep page scan');
+            return client.execute(function getPageInfo() {
                 /**
                  * remove scrollbars
                  */
@@ -116,145 +116,183 @@ module.exports = function documentScreenshot(fileName, callback) {
                     documentHeight: document.documentElement.scrollHeight,
                     devicePixelRatio: window.devicePixelRatio
                 };
-            }).then(function(res) {
-                cb(null, res);
-            });
-        },
+            }).then(function storePageInfo(res) { pageInfo = res.value; });
+        })
 
         /*!
          * take viewport shots and cache them into tmp dir
          */
-        function(res, cb) {
-            response.execute.push(res);
+        .then(function cacheViewportShots() {
+            // console.log('cacheViewportShots || In');
 
-            /*!
-             * run scan
-             */
-            async.whilst(
+            // While runner
+            var repeater = function repeater(condition, body) {
+                if (!condition()) { return; }
 
-                /*!
-                 * while expression
-                 */
-                function() {
-                    return (currentXPos < (response.execute[0].value.documentWidth / response.execute[0].value.screenWidth));
-                },
+                return body().then(function runNextBody() {
+                    return repeater(condition, body);
+                });
+            };
 
-                /*!
-                 * loop function
-                 */
-                function(finishedScreenshot) {
-                    response.screenshot = [];
+            // While condition
+            var checkPos = function checkPos() {
+                return x < (
+                    pageInfo.documentWidth /
+                    pageInfo.screenWidth
+                );
+            };
 
-                    async.waterfall([
+            // While body
+            var loop = function loop() {
+                // console.log('loop || In');
 
-                        /*!
-                         * take screenshot of viewport
-                         */
-                        self.screenshot.bind(self),
+                var deferred = q.defer();
 
-                        /*!
-                         * cache image into tmp dir
-                         */
-                        function(res, cb) {
-                            var file = tmpDir + '/' + currentXPos + '-' + currentYPos + '.png';
-                            var image = gm(new Buffer(res.value, 'base64'));
+                // Take viewport screenshot
+                deferred.resolve( client.screenshot.bind(client)() );
 
-                            if (response.execute[0].value.devicePixelRatio > 1) {
-                                var percent = 100 / response.execute[0].value.devicePixelRatio;
-                                image.resize(percent, percent, "%");
-                            }
+                var promise = deferred.promise;
 
-                            image.crop(response.execute[0].value.screenWidth, response.execute[0].value.screenHeight, 0, 0);
-                            image.write(file, cb);
-                            response.screenshot.push(res);
+                return promise
 
-                            if (!cropImages[currentXPos]) {
-                                cropImages[currentXPos] = [];
-                            }
+                    .then(function cacheImage(res) {
+                        // console.log('cacheImage || In');
 
-                            cropImages[currentXPos][currentYPos] = file;
+                        var deferred = q.defer();
 
-                            currentYPos++;
-                            if (currentYPos > Math.floor(response.execute[0].value.documentHeight / response.execute[0].value.screenHeight)) {
-                                currentYPos = 0;
-                                currentXPos++;
-                            }
-                        },
+                        var tmpFileName = tmpDir + '/' + x + '-' + y + '.png';
+                        var image = gm(new Buffer(res.value, 'base64'));
 
-                        /*!
-                         * scroll to next area
-                         */
-                        function() {
-                            self.execute(scrollFn,
-                                currentXPos * response.execute[0].value.screenWidth,
-                                currentYPos * response.execute[0].value.screenHeight,
-                                function(val, res) {
-                                    response.execute.push(res);
-                                }
-                            ).pause(100).call(arguments[arguments.length - 1]);
+                        if (pageInfo.devicePixelRatio > 1) {
+                            var percent = 100 / pageInfo.devicePixelRatio;
+                            image.resize(percent, percent, "%");
                         }
 
-                    ], finishedScreenshot);
-                },
-                cb
-            );
-        },
+                        image.crop(pageInfo.screenWidth, pageInfo.screenHeight, 0, 0);
+                        
+
+                        if (!cropImages[x]) {
+                            cropImages[x] = [];
+                        }
+
+                        cropImages[x][y] = tmpFileName;
+
+                        y++;
+
+                        var docBottom = Math.floor(
+                            pageInfo.documentHeight /
+                            pageInfo.screenHeight
+                        );
+
+                        if (y > docBottom) {
+                            y = 0;
+                            x++;
+                        }
+
+                        image.write(tmpFileName, deferred.resolve);
+
+                        return deferred.promise;
+                    })
+
+                    .then(function scrollToNext() {
+                        // console.log('scrollToNext || In');
+                        return client
+                            .execute(scrollFn, x * pageInfo.screenWidth, y * pageInfo.screenHeight)
+                            .pause(100);
+                    });
+            };
+
+            // Start 'while loop'
+            return repeater(checkPos, loop);
+
+        })
 
         /*!
          * ensure that filename exists
          */
-        function(cb) {
-            var dir = fileName.replace(/[^\/ \\]*\.png$/,'');
-            fs.ensureDir(dir, function(err) {
-                cb(err);
-            });
-        },
+        .then(function ensureDestinationFile() {
+            // console.log('ensureDestinationFile || In');
+            var dir = fileName.replace(/[^\/ \\]*\.(png|jpe?g|gif|tiff?)$/,'');
+            return fs.mkdirsSync(dir);
+        })
 
         /*!
          * concats all shots
          */
-        function(cb) {
+        .then(function concatAllShots() {
+            // console.log('concatAllShots || In');
             var subImg = 0;
 
-            async.eachSeries(cropImages, function(x, cb) {
-                var col = gm(x.shift());
-                col.append.apply(col, x);
+            var screenshot = null;
+
+            var concatCol = function concatCol(verticalShotArray){
+                var deferred = q.defer();
+                
+                // Convert array of filenames to a gm image
+                var col = gm(verticalShotArray.shift());
+                col.append.apply(col, verticalShotArray);
 
                 if (!screenshot) {
+                    // First screenshot
                     screenshot = col;
-                    col.write(fileName, cb);
+                    col.write(fileName, deferred.resolve);
+
                 } else {
-                    col.write(tmpDir + '/' + (++subImg) + '.png', function() {
-                        gm(fileName).append(tmpDir + '/' + subImg + '.png', true).write(fileName, cb);
+                    // Previous columns saved. Concat col to existing image.
+                    var subImgPath = tmpDir + '/' + (++subImg) + '.png';
+                    col.write(subImgPath, function handleWriteCol() {
+                        gm(fileName)
+                            .append(subImgPath, true)
+                            .write(fileName, deferred.resolve);
                     });
                 }
-            }, cb);
-        },
+                return deferred.promise;
+            };
+
+            return cropImages.reduce(function columnsToPromiseChain(last, next) {
+                return last.then(function concatNextCol(lastVal) {
+                    return concatCol(next);
+                });
+            }, q() );
+            
+            
+        })
 
         /*!
          * crop screenshot regarding page size
          */
-        function() {
-            gm(fileName).crop(response.execute[0].value.documentWidth, response.execute[0].value.documentHeight, 0, 0).write(fileName, arguments[arguments.length - 1]);
-        },
+        .then(function cropShot() {
+            // console.log('In crop screenshot');
+
+            var deferred = q.defer();
+
+            var val = pageInfo;
+            var w = val.documentWidth;
+            var h = val.documentHeight;
+
+            gm(fileName)
+                .crop(w, h, 0, 0)
+                .write(fileName, deferred.resolve);
+
+            return deferred.promise;
+        })
 
         /*!
          * remove tmp dir
          */
-        function() {
-            rimraf(tmpDir, arguments[arguments.length - 1]);
-        },
+        .then(function rmTmpDir() {
+            // console.log('In remove tmp dir');
+            var deferred = q.defer();
+            rimraf(tmpDir, deferred.resolve);
+            return deferred.promise;
+        })
 
         /*!
          * scroll back to start position
          */
-        function(cb) {
-            self.execute(scrollFn, 0, 0).then(function (res){
-                return cb(null, res);
-            });
-        }
-    ], function(err) {
-        callback(err, response);
-    });
+        .then(function scrollToTop() {
+            // console.log('In scroll back to start');
+            return client.execute(scrollFn, 0, 0);
+        });
 
 };
