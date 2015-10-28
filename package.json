@@ -13,9 +13,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "async": "^1.4.2",
-    "gm": "^1.20.0",
-    "rimraf": "^2.4.3"
+    "fs-extra": "^0.26.0",
+    "gm": "^1.20.0"
   },
   "keywords": [
     "webdriverjs",

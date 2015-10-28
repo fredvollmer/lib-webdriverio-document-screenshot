@@ -1,5 +1,6 @@
-/* jshint node: true */
 'use strict';
+/* jshint node: true */
+/* global document,window */
 
 /**
  *
@@ -9,41 +10,50 @@
     :docShot.js
     client
         .windowHandleSize({width: 500, height: 500})
-        .docShot('wholeScreen.png') // makes screenshot of whole document
+        .docShot('wholeScreen.png', {shotDelay: 200})
         .end();
  * </example>
  *
- * @param {String}   fileName    path of generated image (relative to the execution directory)
+ * @param {String}   fileName   path of generated image (relative to the execution directory)
+ * @param {Object}   options    optional settings
+ * @param {Object}   options.shotDelay    time in ms to wait before taking screenshots (default: 100)
  *
  * @uses protocol/execute, protocol/screenshot, protocol/pause
  * @type utility
  *
  */
 
-/* global document,window */
-
+var path = require('path');
 var fs = require('fs-extra');
 var gm = require('gm');
-var rimraf = require('rimraf');
-var generateUUID = require('../utils/generateUUID.js');
-var path = require('path');
-
 var q = require('q');
 
-module.exports = function documentScreenshot(fileName) {
+var generateUUID = require('../utils/generateUUID.js');
 
+module.exports = function documentScreenshot(fileName, options) {
 
-    var ErrorHandler = this.ErrorHandler;
+    var client = this;
+    options = options || {};
 
     /*!
      * parameter check
      */
+    var ErrorHandler = client.ErrorHandler;
     if (typeof fileName !== 'string') {
-        throw new ErrorHandler.CommandError('typeof file name is "' + (typeof fileName) + '". Should be "string"');
+        throw new ErrorHandler.CommandError(
+            'typeof required "fileName" parameter is "' + (typeof fileName) + '". Should be "string"'
+        );
+    }
+    if (options.shotDelay && typeof options.shotDelay !== 'number') {
+        throw new ErrorHandler.CommandError(
+            'typeof optional "shotDelay" option is "' + (typeof options.shotDelay) + '". Should be "number".'
+        );
     }
 
-    var client = this;
+    // options
+    var shotDelay = options.shotDelay || 100;
 
+    // Vars shared across async calls
     var pageInfo = null;
     var tmpDir = null;
     var cropImages = [];
@@ -71,6 +81,7 @@ module.exports = function documentScreenshot(fileName) {
         document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';
     };
 
+    // Return a promise
     return q()
 
         /*!
@@ -198,7 +209,7 @@ module.exports = function documentScreenshot(fileName) {
                         // console.log('scrollToNext || In');
                         return client
                             .execute(scrollFn, x * pageInfo.screenWidth, y * pageInfo.screenHeight)
-                            .pause(100);
+                            .pause(shotDelay);
                     });
             };
 
@@ -283,7 +294,7 @@ module.exports = function documentScreenshot(fileName) {
         .then(function rmTmpDir() {
             // console.log('In remove tmp dir');
             var deferred = q.defer();
-            rimraf(tmpDir, deferred.resolve);
+            fs.remove(tmpDir, deferred.resolve);
             return deferred.promise;
         })
 
