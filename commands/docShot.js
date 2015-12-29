@@ -246,7 +246,12 @@ module.exports = function documentScreenshot(fileName, options) {
                 if (!screenshot) {
                     // First screenshot
                     screenshot = col;
-                    col.write(fileName, deferred.resolve);
+                    col.write(fileName, function (err) {
+                        if (err) {
+                            deferred.reject(err);
+                        }
+                        deferred.resolve();
+                    });
 
                 } else {
                     // Previous columns saved. Concat col to existing image.
@@ -254,7 +259,12 @@ module.exports = function documentScreenshot(fileName, options) {
                     col.write(subImgPath, function handleWriteCol() {
                         gm(fileName)
                             .append(subImgPath, true)
-                            .write(fileName, deferred.resolve);
+                            .write(fileName, function (err) {
+                                if (err) {
+                                    deferred.reject(err);
+                                }
+                                deferred.resolve();
+                            });
                     });
                 }
                 return deferred.promise;
