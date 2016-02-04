@@ -49,8 +49,14 @@ module.exports = function documentScreenshot(fileName, options) {
             'typeof optional "shotDelay" option is "' + (typeof options.shotDelay) + '". Should be "number".'
         );
     }
+    if (options.shouldScroll && typeof options.shouldScroll !== 'boolean') {
+        throw new ErrorHandler.CommandError(
+            'typeof optional "shouldScroll" option is "' + (typeof options.shouldScroll) + '". Should be "boolean".'
+        );
+    }
 
     // options
+    var shouldScroll = options.shouldScroll || true;
     var shotDelay = options.shotDelay || 100;
 
     // Vars shared across async calls
@@ -213,8 +219,8 @@ module.exports = function documentScreenshot(fileName, options) {
                     });
             };
 
-            // Start 'while loop'
-            return repeater(checkPos, loop);
+            // Start 'while loop' or just take 1 shot
+            return shouldScroll ? repeater(checkPos, loop) : loop();
 
         })
 
