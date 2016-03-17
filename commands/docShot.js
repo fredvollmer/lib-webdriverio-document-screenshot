@@ -31,7 +31,6 @@ var q = require('q');
 var generateUUID = require('../utils/generateUUID.js');
 
 module.exports = function documentScreenshot(fileName, options) {
-
     var client = this;
     options = options || {};
 
@@ -70,7 +69,7 @@ module.exports = function documentScreenshot(fileName, options) {
         /**
          * IE8 or older
          */
-        if(document.all && !document.addEventListener) {
+        if (document.all && !document.addEventListener) {
             /**
              * this still might not work
              * seems that IE8 scroll back to 0,0 before taking screenshots
@@ -93,7 +92,7 @@ module.exports = function documentScreenshot(fileName, options) {
         /*!
          * create tmp directory to cache viewport shots
          */
-        .then(function makeTmpDir(){
+        .then(function makeTmpDir() {
             var deferred = q.defer();
 
             var uuid = generateUUID();
@@ -107,7 +106,7 @@ module.exports = function documentScreenshot(fileName, options) {
         /*!
          * prepare page scan
          */
-        .then(function prepPageScan(){
+        .then(function prepPageScan() {
             // console.log('In prep page scan');
             return client.execute(function getPageInfo() {
                 /**
@@ -117,6 +116,10 @@ module.exports = function documentScreenshot(fileName, options) {
                 document.body.style.height = 'auto';
                 document.body.style.height = document.documentElement.scrollHeight + 'px';
                 document.body.style.overflow = 'hidden';
+
+                if (window.chrome) {
+                    document.styleSheets[0].insertRule('::-webkit-scrollbar {width: 0px;}', 0);
+                }
 
                 /**
                  * scroll back to start scanning
@@ -166,7 +169,7 @@ module.exports = function documentScreenshot(fileName, options) {
                 var deferred = q.defer();
 
                 // Take viewport screenshot
-                deferred.resolve( client.screenshot.bind(client)() );
+                deferred.resolve(client.screenshot.bind(client)());
 
                 var promise = deferred.promise;
 
@@ -182,11 +185,10 @@ module.exports = function documentScreenshot(fileName, options) {
 
                         if (pageInfo.devicePixelRatio > 1) {
                             var percent = 100 / pageInfo.devicePixelRatio;
-                            image.resize(percent, percent, "%");
+                            image.resize(percent, percent, '%');
                         }
 
                         image.crop(pageInfo.screenWidth, pageInfo.screenHeight, 0, 0);
-                        
 
                         if (!cropImages[x]) {
                             cropImages[x] = [];
@@ -221,7 +223,6 @@ module.exports = function documentScreenshot(fileName, options) {
 
             // Start 'while loop' or just take 1 shot
             return shouldScroll ? repeater(checkPos, loop) : loop();
-
         })
 
         /*!
@@ -229,7 +230,7 @@ module.exports = function documentScreenshot(fileName, options) {
          */
         .then(function ensureDestinationFile() {
             // console.log('ensureDestinationFile || In');
-            var dir = fileName.replace(/[^\/ \\]*\.(png|jpe?g|gif|tiff?)$/,'');
+            var dir = fileName.replace(/[^\/ \\]*\.(png|jpe?g|gif|tiff?)$/, '');
             return fs.mkdirsSync(dir);
         })
 
@@ -242,9 +243,9 @@ module.exports = function documentScreenshot(fileName, options) {
 
             var screenshot = null;
 
-            var concatCol = function concatCol(verticalShotArray){
+            var concatCol = function concatCol(verticalShotArray) {
                 var deferred = q.defer();
-                
+
                 // Convert array of filenames to a gm image
                 var col = gm(verticalShotArray.shift());
                 col.append.apply(col, verticalShotArray);
@@ -258,7 +259,6 @@ module.exports = function documentScreenshot(fileName, options) {
                         }
                         deferred.resolve();
                     });
-
                 } else {
                     // Previous columns saved. Concat col to existing image.
                     var subImgPath = tmpDir + '/' + (++subImg) + '.png';
@@ -280,9 +280,7 @@ module.exports = function documentScreenshot(fileName, options) {
                 return last.then(function concatNextCol(lastVal) {
                     return concatCol(next);
                 });
-            }, q() );
-            
-            
+            }, q());
         })
 
         /*!
@@ -321,5 +319,4 @@ module.exports = function documentScreenshot(fileName, options) {
             // console.log('In scroll back to start');
             return client.execute(scrollFn, 0, 0);
         });
-
 };
