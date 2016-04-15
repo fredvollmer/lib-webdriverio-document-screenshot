@@ -7,10 +7,10 @@
  * Save a screenshot as a base64 encoded image with the current state of the browser.
  *
  * <example>
-    :docShot.js
+    :documentScreenshot.js
     client
         .windowHandleSize({width: 500, height: 500})
-        .docShot('wholeScreen.png', {shotDelay: 200})
+        .documentScreenshot('wholeScreen.png', {shotDelay: 200})
         .end();
  * </example>
  *
@@ -117,7 +117,7 @@ module.exports = function documentScreenshot(fileName, options) {
                 document.body.style.height = document.documentElement.scrollHeight + 'px';
                 document.body.style.overflow = 'hidden';
 
-                if (window.chrome) {
+                if (navigator.userAgent.indexOf('Chrome') > -1) {
                     document.styleSheets[0].insertRule('::-webkit-scrollbar {width: 0px;}', 0);
                 }
 

@@ -1,1 +1,1 @@
-module.exports = require('./commands/docShot');
+module.exports = require('./commands/documentScreenshot');

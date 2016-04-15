@@ -1,6 +1,6 @@
 {
-  "name": "webdriverio-docShot",
-  "version": "1.0.2",
+  "name": "lib-webdriverio-document-screenshot",
+  "version": "1.0.3",
   "description": "WebdriverIO plugin to save a screenshot of the entire screenshot document",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/cbtnuggets/webdriverio-docShot.git"
+    "url": "git://github.com/cbtnuggets/lib-webdriverio-document-screenshot.git"
   },
   "author": "",
   "license": "ISC",
