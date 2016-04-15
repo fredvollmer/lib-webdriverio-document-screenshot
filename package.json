@@ -1,6 +1,6 @@
 {
   "name": "lib-webdriverio-document-screenshot",
-  "version": "1.0.3",
+  "version": "0.0.1",
   "description": "WebdriverIO plugin to save a screenshot of the entire screenshot document",
   "main": "index.js",
   "scripts": {
@@ -24,5 +24,13 @@
     "plugin",
     "screenshot",
     "document"
-  ]
+  ],
+  "private": false,
+  "publishConfig": {
+    "registry": "http://npm.aws.cbtnuggets.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cbtnuggets/lib-visual-regression-testing.git"
+  }
 }
