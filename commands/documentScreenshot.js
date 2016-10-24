@@ -55,7 +55,11 @@ module.exports = function documentScreenshot(fileName, options) {
     }
 
     // options
-    var shouldScroll = options.shouldScroll || true;
+    var shouldScroll = true;
+    if (options.shouldScroll === false) {
+        shouldScroll = false;
+    }
+    // var shouldScroll = options.shouldScroll || true;
     var shotDelay = options.shotDelay || 100;
 
     // Vars shared across async calls
