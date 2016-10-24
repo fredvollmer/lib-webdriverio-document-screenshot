@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="document_screenshot_scrolling" timestamp="2016-10-24T11:38:24" time="7.272" tests="4" failures="0" errors="0" skipped="0">
+    <properties>
+      <property name="specId" value="5fe9d988f6e9a1be39ac334141f4b6e3"/>
+      <property name="suiteName" value="document screenshot scrolling"/>
+      <property name="capabilities" value="phantomjs"/>
+    </properties>
+    <testcase classname="phantomjs.document screenshot scrolling" name="should capture the document" time="7.261">
+      <system-out>
+        <![CDATA[
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/url - {"url":"http://localhost:3000/index.html"}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":{}}
+COMMAND: GET http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/window/current/size - {}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":{"height":300,"width":400}}
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/execute - {"script":"return (function getViewportSize() {\n    return {\n        screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),\n        screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)\n    };\n}).apply(null, arguments)","args":[]}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":{"screenWidth":400,"screenHeight":300}}
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/window/current/size - {"width":1024,"height":768}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":{}}
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/execute - {"script":"return (function getViewportSize() {\n    return {\n        screenWidth: Math.max(document.documentElement.clientWidth, window.innerWidth || 0),\n        screenHeight: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)\n    };\n}).apply(null, arguments)","args":[]}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":{"screenWidth":1024,"screenHeight":768}}
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/execute - {"script":"return (function getPageInfo() {\n                /**\n                 * remove scrollbars\n                 */\n                // reset height in case we're changing viewports\n                document. ... (1099 more bytes)","args":[]}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":{"screenWidth":1024,"screenHeight":768,"documentWidth":1024,"documentHeight":3206,"devicePixelRatio":1}}
+COMMAND: GET http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/screenshot - {}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":"[base64] 979956 bytes"}
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/execute - {"script":"return (function scrollFn(w, h) {\n        /**\n         * IE8 or older\n         */\n        if (document.all && !document.addEventListener) {\n            /**\n             * this still might not work\n             * seems that IE8 scroll back to 0,0 before taking screenshots\n             */\n            document.body.style.marginTop = '-' + h + 'px';\n            document.body.style.marginLeft = '-' + w + 'px';\n            return;\n        }\n\n        document.body.style.webkitTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.mozTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.msTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.oTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';\n    }).apply(null, arguments)","args":[0,768]}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":null}
+COMMAND: GET http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/screenshot - {}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":"[base64] 921348 bytes"}
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/execute - {"script":"return (function scrollFn(w, h) {\n        /**\n         * IE8 or older\n         */\n        if (document.all && !document.addEventListener) {\n            /**\n             * this still might not work\n             * seems that IE8 scroll back to 0,0 before taking screenshots\n             */\n            document.body.style.marginTop = '-' + h + 'px';\n            document.body.style.marginLeft = '-' + w + 'px';\n            return;\n        }\n\n        document.body.style.webkitTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.mozTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.msTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.oTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';\n    }).apply(null, arguments)","args":[0,1536]}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":null}
+COMMAND: GET http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/screenshot - {}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":"[base64] 722128 bytes"}
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/execute - {"script":"return (function scrollFn(w, h) {\n        /**\n         * IE8 or older\n         */\n        if (document.all && !document.addEventListener) {\n            /**\n             * this still might not work\n             * seems that IE8 scroll back to 0,0 before taking screenshots\n             */\n            document.body.style.marginTop = '-' + h + 'px';\n            document.body.style.marginLeft = '-' + w + 'px';\n            return;\n        }\n\n        document.body.style.webkitTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.mozTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.msTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.oTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';\n    }).apply(null, arguments)","args":[0,2304]}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":null}
+COMMAND: GET http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/screenshot - {}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":"[base64] 572732 bytes"}
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/execute - {"script":"return (function scrollFn(w, h) {\n        /**\n         * IE8 or older\n         */\n        if (document.all && !document.addEventListener) {\n            /**\n             * this still might not work\n             * seems that IE8 scroll back to 0,0 before taking screenshots\n             */\n            document.body.style.marginTop = '-' + h + 'px';\n            document.body.style.marginLeft = '-' + w + 'px';\n            return;\n        }\n\n        document.body.style.webkitTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.mozTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.msTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.oTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';\n    }).apply(null, arguments)","args":[0,3072]}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":null}
+COMMAND: GET http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/screenshot - {}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":"[base64] 396048 bytes"}
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/execute - {"script":"return (function scrollFn(w, h) {\n        /**\n         * IE8 or older\n         */\n        if (document.all && !document.addEventListener) {\n            /**\n             * this still might not work\n             * seems that IE8 scroll back to 0,0 before taking screenshots\n             */\n            document.body.style.marginTop = '-' + h + 'px';\n            document.body.style.marginLeft = '-' + w + 'px';\n            return;\n        }\n\n        document.body.style.webkitTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.mozTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.msTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.oTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';\n    }).apply(null, arguments)","args":[1024,0]}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":null}
+COMMAND: POST http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff/execute - {"script":"return (function scrollFn(w, h) {\n        /**\n         * IE8 or older\n         */\n        if (document.all && !document.addEventListener) {\n            /**\n             * this still might not work\n             * seems that IE8 scroll back to 0,0 before taking screenshots\n             */\n            document.body.style.marginTop = '-' + h + 'px';\n            document.body.style.marginLeft = '-' + w + 'px';\n            return;\n        }\n\n        document.body.style.webkitTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.mozTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.msTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.oTransform = 'translate(-' + w + 'px, -' + h + 'px)';\n        document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';\n    }).apply(null, arguments)","args":[0,0]}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":null}
+]]>
+      </system-out>
+    </testcase>
+    <testcase classname="phantomjs.document screenshot scrolling" name="shoud produce an image file" time="0"/>
+    <testcase classname="phantomjs.document screenshot scrolling" name="image should be the correct size" time="0.004"/>
+    <testcase classname="phantomjs.document screenshot scrolling" name="should be equal to fixture image" time="0.003">
+      <system-out>
+        <![CDATA[
+COMMAND: DELETE http://127.0.0.1:4444/wd/hub/session/0bf38f30-9a19-11e6-b6a7-43665c0310ff - {}
+RESULT: {"sessionId":"0bf38f30-9a19-11e6-b6a7-43665c0310ff","status":0,"value":{}}
+]]>
+      </system-out>
+    </testcase>
+  </testsuite>
+</testsuites>

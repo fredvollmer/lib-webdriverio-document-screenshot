@@ -1,20 +1,26 @@
 {
   "name": "lib-webdriverio-document-screenshot",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "WebdriverIO plugin to save a screenshot of the entire screenshot document",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "wdio test/wdio.conf.js",
+    "lint": "./node_modules/.bin/eslint commands/ utils/ test/wdio.conf test/specs/ --ext .js",
+    "clean-bower": "rm -rf test/site/components",
+    "clean-reports": "rm -rf test/reports",
+    "install-bower": "cd test/site/; bower install",
+    "serve-test": "node test/helpers/express.js"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/cbtnuggets/lib-webdriverio-document-screenshot.git"
+    "url": "https://github.com/cbtnuggets/lib-webdriverio-document-screenshot.git"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fs-extra": "^0.26.0",
-    "gm": "^1.20.0"
+    "fs-extra": "^0.30.0",
+    "q": "^1.4.1",
+    "gm": "^1.23.0"
   },
   "keywords": [
     "webdriverjs",
@@ -29,8 +35,15 @@
   "publishConfig": {
     "registry": "http://npm.aws.cbtnuggets.com"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cbtnuggets/lib-webdriverio-document-screenshot.git"
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.7.1",
+    "eslint-config-cbtnuggets": "^4.0.0",
+    "express": "^4.14.0",
+    "mocha": "^3.1.1",
+    "wdio-junit-reporter": "^0.1.0",
+    "wdio-mocha-framework": "^0.4.3",
+    "wdio-phantomjs-service": "^0.1.0",
+    "webdriverio": "^4.2.16"
   }
 }
