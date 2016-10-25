@@ -5,6 +5,9 @@ logs
 # Components
 test/site/components/*
 
+# Build test output
+test/report
+
 # Runtime data
 pids
 *.pid
