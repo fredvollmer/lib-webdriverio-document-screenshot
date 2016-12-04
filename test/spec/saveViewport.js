@@ -1,5 +1,6 @@
-/* global browser, should, fs, gm */
-var testURL = 'http://localhost:3000/index.html';
+'use strict';
+/* global browser, should, fs, gm, EXPRESS_PORT */
+var testURL = `http://localhost:${EXPRESS_PORT}/index.html`;
 var testIndexImageViewport = 'test/reports/index_1024x768.png';
 var fixtureIndexImageViewport = 'test/fixtures/index_1024x768.png';
 describe('document screenshot capturing viewport', function () {

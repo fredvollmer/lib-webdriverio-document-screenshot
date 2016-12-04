@@ -1,6 +1,12 @@
+'use strict';
+/*
+    global browser
+    global EXPRESS_PORT
+ */
 var runningExpress;
 global.gm = require('gm');
 global.fs = require('fs-extra');
+global.EXPRESS_PORT = 3883;
 exports.config = {
 
     //
@@ -124,8 +130,8 @@ exports.config = {
     // See the full list at http://mochajs.org/
     reporterOptions: {
         junit: {
-            outputDir: './test/reports',
-        },
+            outputDir: './test/reports'
+        }
     },
     mochaOpts: {
         ui: 'bdd',
@@ -145,7 +151,7 @@ exports.config = {
         var express = require('express');
         var app = express();
         app.use(express.static('test/site'));
-        runningExpress = app.listen(3000);
+        runningExpress = app.listen(EXPRESS_PORT);
     },
     //
     // Gets executed before test execution begins. At this point you can access all global
@@ -156,7 +162,7 @@ exports.config = {
         chai.Should();
         var documentScreenshot = require('../index.js');
         browser.addCommand('documentScreenshot', documentScreenshot);
-        //global.gm = require('gm');
+        // global.gm = require('gm');
     },
     //
     // Hook that gets executed before the suite starts
@@ -200,7 +206,7 @@ exports.config = {
     //
     // Gets executed after all workers got shut down and the process is about to exit. It is not
     // possible to defer the end of the process using a promise.
-    onComplete: function(exitCode) {
+    onComplete: function (exitCode) {
         runningExpress.close();
     }
-}
+};
