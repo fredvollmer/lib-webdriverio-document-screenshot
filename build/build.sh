@@ -6,11 +6,16 @@ nvm install 4.4.4 || nvm use 4.4.4
 
 NODE_ENV=development npm install
 
-./node_modules/.bin/eslint commands/ utils/ test/wdio.conf test/specs/ --ext .js --quiet
+npm run lint
 
 if [ $? -ne 0 ]; then
-    echo "Eslint failed"
-    exit 1
+    echo "Eslint failed"; exit 1
+fi
+
+npm run install-bower
+
+if [ $? -ne 0 ]; then
+    echo "Installing test site bower failed"; exit 1
 fi
 
 npm test
