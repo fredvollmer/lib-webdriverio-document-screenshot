@@ -1,6 +1,7 @@
 # Logs
 logs
 *.log
+test/reports/
 
 # Components
 test/site/components/*
