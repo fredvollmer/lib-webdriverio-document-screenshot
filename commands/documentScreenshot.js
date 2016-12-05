@@ -27,6 +27,8 @@ var path = require('path');
 var fs = require('fs-extra');
 var gm = require('gm');
 var q = require('q');
+var temp = require('temp').track();
+var os = require('os');
 
 var generateUUID = require('../utils/generateUUID.js');
 
@@ -100,9 +102,16 @@ module.exports = function documentScreenshot(fileName, options) {
             var deferred = q.defer();
 
             var uuid = generateUUID();
-            tmpDir = path.join(__dirname, '..', '.tmp-' + uuid);
+            tmpDir = 'document-screenshot-' + uuid;
 
-            fs.mkdirs(tmpDir, '0755', deferred.resolve);
+            temp.mkdir(tmpDir, function (err, dirPath) {
+                if (err) {
+                    console.log(err);
+                    deferred.reject(err);
+                }
+                tmpDir = dirPath;
+                deferred.resolve();
+            });
 
             return deferred.promise;
         })
@@ -310,9 +319,17 @@ module.exports = function documentScreenshot(fileName, options) {
          * remove tmp dir
          */
         .then(function rmTmpDir() {
-            // console.log('In remove tmp dir');
+            console.log('In remove tmp dir');
             var deferred = q.defer();
-            fs.remove(tmpDir, deferred.resolve);
+
+            temp.cleanup(function (err, stats) {
+                if (err) {
+                    console.log(err);
+                    deferred.reject(err);
+                }
+                console.log(stats);
+                deferred.resolve();
+            });
             return deferred.promise;
         })
 
@@ -322,5 +339,9 @@ module.exports = function documentScreenshot(fileName, options) {
         .then(function scrollToTop() {
             // console.log('In scroll back to start');
             return client.execute(scrollFn, 0, 0);
+        })
+
+        .fail(function (error) {
+            console.log('Error: ' + error);
         });
 };

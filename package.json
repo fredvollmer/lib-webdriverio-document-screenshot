@@ -8,7 +8,7 @@
     "lint": "./node_modules/eslint/bin/eslint.js commands/ utils/ test/wdio.conf test/specs/ --ext .js",
     "clean-bower": "rm -rf test/site/components",
     "clean-reports": "rm -rf test/reports",
-    "install-bower": "cd test/site/; ../../node_modules/bower/bin/bower install; cd ../../",
+    "install-bower": "cd test/site/; ../../node_modules/bower/bin/bower --allow-root install; cd ../../",
     "serve-test": "node test/helpers/express.js"
   },
   "repository": {
@@ -20,7 +20,8 @@
   "dependencies": {
     "fs-extra": "^0.30.0",
     "gm": "^1.23.0",
-    "q": "^1.4.1"
+    "q": "^1.4.1",
+    "temp": "^0.8.3"
   },
   "keywords": [
     "webdriverjs",
