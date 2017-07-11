@@ -1,5 +1,5 @@
 {
-  ": "lib-webdriverio-document-screenshot",
+  "name": "lib-webdriverio-document-screenshot",
   "version": "1.0.8-dev",
   "description": "WebdriverIO plugin to save a screenshot of the entire screenshot document",
   "main": "index.js",
