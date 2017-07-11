@@ -5,7 +5,7 @@ test/reports/
 
 # Components
 test/site/components/*
-
+test/reports
 # Build test output
 test/report
 

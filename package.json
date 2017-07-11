@@ -1,14 +1,14 @@
 {
   "name": "lib-webdriverio-document-screenshot",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "WebdriverIO plugin to save a screenshot of the entire screenshot document",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/webdriverio/bin/wdio test/wdio.conf.js",
-    "lint": "./node_modules/eslint/bin/eslint.js commands/ utils/ test/wdio.conf test/specs/ --ext .js",
+    "test": "wdio test/wdio.conf.js",
+    "lint": "./node_modules/.bin/eslint commands/ utils/ test/wdio.conf test/specs/ --ext .js",
     "clean-bower": "rm -rf test/site/components",
     "clean-reports": "rm -rf test/reports",
-    "install-bower": "cd test/site/; ../../node_modules/bower/bin/bower --allow-root install; cd ../../",
+    "install-bower": "cd test/site/; bower install",
     "serve-test": "node test/helpers/express.js"
   },
   "repository": {
@@ -19,9 +19,8 @@
   "license": "ISC",
   "dependencies": {
     "fs-extra": "^0.30.0",
-    "gm": "^1.23.0",
     "q": "^1.4.1",
-    "temp": "^0.8.3"
+    "gm": "^1.23.0"
   },
   "keywords": [
     "webdriverjs",
@@ -40,7 +39,6 @@
     "chai": "^3.5.0",
     "eslint": "^3.7.1",
     "eslint-config-cbtnuggets": "^4.0.0",
-    "bower": "^1.8.0",
     "express": "^4.14.0",
     "mocha": "^3.1.1",
     "wdio-junit-reporter": "^0.1.0",

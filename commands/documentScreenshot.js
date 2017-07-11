@@ -27,8 +27,6 @@ var path = require('path');
 var fs = require('fs-extra');
 var gm = require('gm');
 var q = require('q');
-var temp = require('temp').track();
-var os = require('os');
 
 var generateUUID = require('../utils/generateUUID.js');
 
@@ -71,7 +69,7 @@ module.exports = function documentScreenshot(fileName, options) {
     var x = 0;
     var y = 0;
 
-    var scrollFn = function scrollFn(w, h) {
+    var scrollFn = function scrollFn(w, h, shouldClientScroll) {
         /**
          * IE8 or older
          */
@@ -85,11 +83,13 @@ module.exports = function documentScreenshot(fileName, options) {
             return;
         }
 
-        document.body.style.webkitTransform = 'translate(-' + w + 'px, -' + h + 'px)';
-        document.body.style.mozTransform = 'translate(-' + w + 'px, -' + h + 'px)';
-        document.body.style.msTransform = 'translate(-' + w + 'px, -' + h + 'px)';
-        document.body.style.oTransform = 'translate(-' + w + 'px, -' + h + 'px)';
-        document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';
+        if (shouldClientScroll === true) {
+            document.body.style.webkitTransform = 'translate(-' + w + 'px, -' + h + 'px)';
+            document.body.style.mozTransform = 'translate(-' + w + 'px, -' + h + 'px)';
+            document.body.style.msTransform = 'translate(-' + w + 'px, -' + h + 'px)';
+            document.body.style.oTransform = 'translate(-' + w + 'px, -' + h + 'px)';
+            document.body.style.transform = 'translate(-' + w + 'px, -' + h + 'px)';
+        }
     };
 
     // Return a promise
@@ -102,16 +102,9 @@ module.exports = function documentScreenshot(fileName, options) {
             var deferred = q.defer();
 
             var uuid = generateUUID();
-            tmpDir = 'document-screenshot-' + uuid;
+            tmpDir = path.join(__dirname, '..', '.tmp-' + uuid);
 
-            temp.mkdir(tmpDir, function (err, dirPath) {
-                if (err) {
-                    console.log(err);
-                    deferred.reject(err);
-                }
-                tmpDir = dirPath;
-                deferred.resolve();
-            });
+            fs.mkdirs(tmpDir, '0755', deferred.resolve);
 
             return deferred.promise;
         })
@@ -120,24 +113,25 @@ module.exports = function documentScreenshot(fileName, options) {
          * prepare page scan
          */
         .then(function prepPageScan() {
-            // console.log('In prep page scan');
-            return client.execute(function getPageInfo() {
+            console.log('In prep page scan');
+            return client.execute(function getPageInfo(shouldClientScroll) {
                 /**
                  * remove scrollbars
                  */
-                // reset height in case we're changing viewports
-                document.body.style.height = 'auto';
-                document.body.style.height = document.documentElement.scrollHeight + 'px';
                 document.body.style.overflow = 'hidden';
 
                 if (navigator.userAgent.indexOf('Chrome') > -1) {
                     document.styleSheets[0].insertRule('::-webkit-scrollbar {width: 0px;}', 0);
                 }
-
-                /**
-                 * scroll back to start scanning
-                 */
-                window.scrollTo(0, 0);
+                // reset height in case we're changing viewports
+                if (shouldClientScroll === true) {
+                    document.body.style.height = 'auto';
+                    document.body.style.height = document.documentElement.scrollHeight + 'px';
+                    /**
+                     * scroll back to start scanning
+                     */
+                    window.scrollTo(0, 0);
+                }
 
                 /**
                  * get viewport width/height and total width/height
@@ -149,14 +143,14 @@ module.exports = function documentScreenshot(fileName, options) {
                     documentHeight: document.documentElement.scrollHeight,
                     devicePixelRatio: window.devicePixelRatio
                 };
-            }).then(function storePageInfo(res) { pageInfo = res.value; });
+            }, shouldScroll).then(function storePageInfo(res) { pageInfo = res.value; });
         })
 
         /*!
          * take viewport shots and cache them into tmp dir
          */
         .then(function cacheViewportShots() {
-            // console.log('cacheViewportShots || In');
+            console.log('cacheViewportShots || In');
 
             // While runner
             var repeater = function repeater(condition, body) {
@@ -177,7 +171,7 @@ module.exports = function documentScreenshot(fileName, options) {
 
             // While body
             var loop = function loop() {
-                // console.log('loop || In');
+                console.log('loop || In');
 
                 var deferred = q.defer();
 
@@ -189,7 +183,7 @@ module.exports = function documentScreenshot(fileName, options) {
                 return promise
 
                     .then(function cacheImage(res) {
-                        // console.log('cacheImage || In');
+                        console.log('cacheImage || In');
 
                         var deferred = q.defer();
 
@@ -227,9 +221,9 @@ module.exports = function documentScreenshot(fileName, options) {
                     })
 
                     .then(function scrollToNext() {
-                        // console.log('scrollToNext || In');
+                        console.log('scrollToNext || In');
                         return client
-                            .execute(scrollFn, x * pageInfo.screenWidth, y * pageInfo.screenHeight)
+                            .execute(scrollFn, x * pageInfo.screenWidth, y * pageInfo.screenHeight, shouldScroll)
                             .pause(shotDelay);
                     });
             };
@@ -242,7 +236,7 @@ module.exports = function documentScreenshot(fileName, options) {
          * ensure that filename exists
          */
         .then(function ensureDestinationFile() {
-            // console.log('ensureDestinationFile || In');
+            console.log('ensureDestinationFile || In');
             var dir = fileName.replace(/[^\/ \\]*\.(png|jpe?g|gif|tiff?)$/, '');
             return fs.mkdirsSync(dir);
         })
@@ -251,7 +245,7 @@ module.exports = function documentScreenshot(fileName, options) {
          * concats all shots
          */
         .then(function concatAllShots() {
-            // console.log('concatAllShots || In');
+            console.log('concatAllShots || In');
             var subImg = 0;
 
             var screenshot = null;
@@ -300,7 +294,7 @@ module.exports = function documentScreenshot(fileName, options) {
          * crop screenshot regarding page size
          */
         .then(function cropShot() {
-            // console.log('In crop screenshot');
+            console.log('In crop screenshot');
 
             var deferred = q.defer();
 
@@ -321,15 +315,7 @@ module.exports = function documentScreenshot(fileName, options) {
         .then(function rmTmpDir() {
             console.log('In remove tmp dir');
             var deferred = q.defer();
-
-            temp.cleanup(function (err, stats) {
-                if (err) {
-                    console.log(err);
-                    deferred.reject(err);
-                }
-                console.log(stats);
-                deferred.resolve();
-            });
+            fs.remove(tmpDir, deferred.resolve);
             return deferred.promise;
         })
 
@@ -337,11 +323,9 @@ module.exports = function documentScreenshot(fileName, options) {
          * scroll back to start position
          */
         .then(function scrollToTop() {
-            // console.log('In scroll back to start');
-            return client.execute(scrollFn, 0, 0);
-        })
-
-        .fail(function (error) {
-            console.log('Error: ' + error);
+            if (shouldScroll === true) {
+                console.log('In scroll back to start');
+                return client.execute(scrollFn, 0, 0, shouldScroll);
+            }
         });
 };
