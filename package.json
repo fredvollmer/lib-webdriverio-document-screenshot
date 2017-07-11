@@ -1,6 +1,6 @@
 {
-  "name": "lib-webdriverio-document-screenshot",
-  "version": "1.0.8",
+  ": "lib-webdriverio-document-screenshot",
+  "version": "1.0.8-dev",
   "description": "WebdriverIO plugin to save a screenshot of the entire screenshot document",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "lint": "./node_modules/.bin/eslint commands/ utils/ test/wdio.conf test/specs/ --ext .js",
     "clean-bower": "rm -rf test/site/components",
     "clean-reports": "rm -rf test/reports",
-    "install-bower": "cd test/site/; bower install",
+    "install-bower": "cd test/site/; ../../node_modules/bower/bin/bower --allow-root install; cd ../../",
     "serve-test": "node test/helpers/express.js"
   },
   "repository": {
