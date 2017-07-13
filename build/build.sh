@@ -24,4 +24,8 @@ if [ $? -ne 0 ]; then
    echo "Node build error!"; exit 1
 fi
 
+rm -rf node_modules
+
+npm install --production
+
 exit 0
