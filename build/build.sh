@@ -24,8 +24,16 @@ if [ $? -ne 0 ]; then
    echo "Node build error!"; exit 1
 fi
 
-rm -rf node_modules
+rm -rf ./node_modules
 
-npm install --production
+if [ $? -ne 0 ]; then
+   echo "Node build error!"; exit 1
+fi
+
+NODE_ENV=production npm install
+
+if [ $? -ne 0 ]; then
+   echo "Node reinstall error!"; exit 1
+fi
 
 exit 0
