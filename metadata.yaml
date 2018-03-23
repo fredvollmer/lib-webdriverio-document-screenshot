@@ -1,3 +1,8 @@
 buildEngine: node-6.9.1
 type: library
-
+buildStepPrepends:
+  install:
+    - "yum -yq install GraphicsMagick"
+buildStepAppends:
+  install:
+    - "find . -printf '%Tc %p\n' | grep 1970 | awk '{print $8}' | xargs -I \"{}\" touch \"{}\""
