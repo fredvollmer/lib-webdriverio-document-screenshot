@@ -33,9 +33,6 @@
     "document"
   ],
   "private": false,
-  "publishConfig": {
-    "registry": "http://npm.aws.cbtnuggets.com"
-  },
   "devDependencies": {
     "bower": "^1.8.0",
     "chai": "^3.5.0",
