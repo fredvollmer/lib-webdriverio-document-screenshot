@@ -1,6 +1,6 @@
 {
   "name": "lib-webdriverio-document-screenshot",
-  "version": "1.0.10-dev",
+  "version": "1.0.11-dev",
   "description": "WebdriverIO plugin to save a screenshot of the entire screenshot document",
   "main": "index.js",
   "scripts": {
@@ -37,10 +37,14 @@
     "registry": "http://npm.aws.cbtnuggets.com"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "eslint": "^3.7.1",
-    "eslint-config-cbtnuggets": "^4.0.0",
     "bower": "^1.8.0",
+    "chai": "^3.5.0",
+    "eslint": "^4.17.0",
+    "eslint-config-cbtnuggets": "^7.0.0",
+    "eslint-plugin-class-property": "^1.0.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.6.1",
     "express": "^4.14.0",
     "mocha": "^3.1.1",
     "wdio-junit-reporter": "^0.1.0",
