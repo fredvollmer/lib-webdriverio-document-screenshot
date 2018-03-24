@@ -1,5 +1,5 @@
 # lib-webdriverio-document-screenshot
-WebdriverIO plugin to save a screenshot of the entire screenshot document.  
+WebdriverIO plugin to save a screenshot of the entire viewport.
 *Re-worked from [documentScreenshot](https://github.com/webdriverio/webdrivercss/blob/master/lib/documentScreenshot.js) from [WebdriverCSS](https://github.com/webdriverio/webdrivercss)*
 
 ## Usage
@@ -35,6 +35,6 @@ client
 ```
 
 ## Libraries
-* Plugin for [WebdriverIO](https://github.com/webdriverio/webdriverio)  
-* [GraphicsMagick](https://github.com/aheckmann/gm) for image manipulation  
-* [fs-extra](https://github.com/jprichardson/node-fs-extra/) for handy file system utilities  
+* Plugin for [WebdriverIO](https://github.com/webdriverio/webdriverio)
+* [GraphicsMagick](https://github.com/aheckmann/gm) for image manipulation
+* [fs-extra](https://github.com/jprichardson/node-fs-extra/) for handy file system utilities
