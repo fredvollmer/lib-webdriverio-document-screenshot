@@ -1,6 +1,6 @@
 'use strict';
 /* jshint node: true */
-/* global document,window */
+/* global document,window,navigator */
 
 /**
  *
@@ -113,7 +113,7 @@ module.exports = function documentScreenshot(fileName, options) {
          * prepare page scan
          */
         .then(function prepPageScan() {
-            console.log('In prep page scan');
+            // console.log('In prep page scan');
             return client.execute(function getPageInfo(shouldClientScroll) {
                 /**
                  * remove scrollbars
@@ -150,7 +150,7 @@ module.exports = function documentScreenshot(fileName, options) {
          * take viewport shots and cache them into tmp dir
          */
         .then(function cacheViewportShots() {
-            console.log('cacheViewportShots || In');
+            // console.log('cacheViewportShots || In');
 
             // While runner
             var repeater = function repeater(condition, body) {
@@ -171,7 +171,7 @@ module.exports = function documentScreenshot(fileName, options) {
 
             // While body
             var loop = function loop() {
-                console.log('loop || In');
+                // console.log('loop || In');
 
                 var deferred = q.defer();
 
@@ -183,7 +183,7 @@ module.exports = function documentScreenshot(fileName, options) {
                 return promise
 
                     .then(function cacheImage(res) {
-                        console.log('cacheImage || In');
+                        // console.log('cacheImage || In');
 
                         var deferred = q.defer();
 
@@ -221,7 +221,7 @@ module.exports = function documentScreenshot(fileName, options) {
                     })
 
                     .then(function scrollToNext() {
-                        console.log('scrollToNext || In');
+                        // console.log('scrollToNext || In');
                         return client
                             .execute(scrollFn, x * pageInfo.screenWidth, y * pageInfo.screenHeight, shouldScroll)
                             .pause(shotDelay);
@@ -236,8 +236,8 @@ module.exports = function documentScreenshot(fileName, options) {
          * ensure that filename exists
          */
         .then(function ensureDestinationFile() {
-            console.log('ensureDestinationFile || In');
-            var dir = fileName.replace(/[^\/ \\]*\.(png|jpe?g|gif|tiff?)$/, '');
+            // console.log('ensureDestinationFile || In');
+            var dir = fileName.replace(/[^/ \\]*\.(png|jpe?g|gif|tiff?)$/, '');
             return fs.mkdirsSync(dir);
         })
 
@@ -245,7 +245,7 @@ module.exports = function documentScreenshot(fileName, options) {
          * concats all shots
          */
         .then(function concatAllShots() {
-            console.log('concatAllShots || In');
+            // console.log('concatAllShots || In');
             var subImg = 0;
 
             var screenshot = null;
@@ -294,7 +294,7 @@ module.exports = function documentScreenshot(fileName, options) {
          * crop screenshot regarding page size
          */
         .then(function cropShot() {
-            console.log('In crop screenshot');
+            // console.log('In crop screenshot');
 
             var deferred = q.defer();
 
@@ -313,7 +313,7 @@ module.exports = function documentScreenshot(fileName, options) {
          * remove tmp dir
          */
         .then(function rmTmpDir() {
-            console.log('In remove tmp dir');
+            // console.log('In remove tmp dir');
             var deferred = q.defer();
             fs.remove(tmpDir, deferred.resolve);
             return deferred.promise;
@@ -324,7 +324,7 @@ module.exports = function documentScreenshot(fileName, options) {
          */
         .then(function scrollToTop() {
             if (shouldScroll === true) {
-                console.log('In scroll back to start');
+                // console.log('In scroll back to start');
                 return client.execute(scrollFn, 0, 0, shouldScroll);
             }
         });
