@@ -1,7 +1,7 @@
 {
   "name": "lib-webdriverio-document-screenshot",
   "version": "1.1.0",
-  "description": "WebdriverIO plugin to save a screenshot of the entire screenshot document",
+  "description": "WebdriverIO plugin to save a screenshot of the entire viewport",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/webdriverio/bin/wdio test/wdio.conf.js",
